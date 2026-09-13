@@ -6,119 +6,156 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![MATLAB](https://img.shields.io/badge/MATLAB-DSP%20System%20Toolbox-orange.svg)]()
 
-Senior Capstone Project | Department of Biomedical Engineering, University of Science and Technology, Aden, Yemen  
+Senior Capstone Project | Department of Biomedical Engineering, Faculty of Engineering and Computing, University of Science and Technology, Aden, Yemen  
 Lead Hardware & DSP Student Engineer: Abdulaziz K. A. Hatem  
-Advisor: Dr. Nasr Kaid Ali AL-Audi (Head of Biomedical Engineering Department)  
+Co-Engineers: Ahmed M. A. S. AlKadhi, Mohammed A. A. Qasem, Khaled A. M. Farhan  
+Capstone Advisor: Dr. Nasr Kaid Ali AL-Audi (Head of Biomedical Engineering Department)  
 Evaluation: 100% (Distinction with Highest Honors)
 
 ---
 
-## Project Overview
+## Project Summary
 
-Patients with advanced Amyotrophic Lateral Sclerosis (ALS), brainstem stroke, or severe spinal injuries often lose voluntary control of their limbs and facial muscles while retaining oculomotor movement (eye blinks and gaze shifts).
+Patients suffering from advanced neuromuscular disorders such as Amyotrophic Lateral Sclerosis (ALS), severe cerebral palsy, or brainstem stroke frequently experience quadriplegia while retaining voluntary oculomotor control.
 
-For our senior graduation project, our 4-member student team designed, built, and evaluated an integrated assistive system controlled entirely by ocular biopotentials (EOG). I served as the lead hardware and DSP engineer, responsible for:
-1. Designing the four-stage discrete Analog Front-End (AFE) circuit on breadboards and custom PCBs.
-2. Developing the digital signal processing and thresholding code in MATLAB and Python.
-3. Programming the Arduino microcontroller firmware for wheelchair motor control and ultrasonic obstacle detection.
-4. Conducting calibration and user evaluation trials with healthy volunteers.
-
-The system performs two functions:
-- **Assistive Virtual Keyboard:** A 4x6 on-screen grid that lets the user type sentences using vertical eye shifts and voluntary blinks, reaching an average speed of 16 characters per minute.
-- **Wheelchair Navigation:** Directional control (forward, left, right, stop) with an autonomous safety override that halts motors if an obstacle is within 25 cm, achieving 92% directional command accuracy.
+For our senior capstone graduation project, our student team designed, fabricated, and experimentally validated an end-to-end assistive Human-Computer Interface (HCI) driven by Electrooculography (EOG) biopotentials. The system enables users to:
+1. **Compose and type text** via an on-screen Arabic virtual optical keyboard at an average throughput of **16.0 characters per minute (CPM)**.
+2. **Control an electric wheelchair** (forward, reverse, turn left, turn right, emergency stop) with an average navigation accuracy of **94.0%** and response latency of **143 ms**, backed by an autonomous ultrasonic collision avoidance safety layer.
 
 ---
 
-## System Architecture
+## Hardware Analog Front-End (AFE) Architecture
+
+The analog conditioning subsystem uses one AD620 instrumentation amplifier and three TL072 low-noise JFET-input dual operational amplifiers powered by a symmetric dual-polarity supply (+-9V):
 
 ```
-[ Ocular Potential at Electrodes ]
-               │
-               ▼
-[ 4-Stage Analog Front-End ]
-  • AD620 Instrumentation Amplifier (Gain = 495)
-  • Active High-Pass Filter (1.6 Hz, LM741)
-  • Active Low-Pass Filter (16.0 Hz, LM741)
-  • Post-Amplifier & 2.5V Level Shifter (Gain = 40.4)
-  • Total System Gain: ~20,000x (0 to 5V Output)
-               │
-               ▼
-[ ATmega328P Microcontroller ]
-  • 10-bit ADC sampled at 250 Hz
-  • Serial UART streaming at 115,200 baud
-               │
-       ┌───────┴───────────────────────┐
-       ▼                               ▼
-[ PC Processing (MATLAB / Python) ]   [ Wheelchair Hardware ]
-  • Baseline drift removal            • Dual H-Bridge motor driver
-  • Saccade peak detection            • HC-SR04 ultrasonic sensor
-  • 4x6 Virtual Keyboard GUI          • Automatic safety cutoff (< 25 cm)
+[ Periorbital Ag/AgCl Electrodes ]
+                 │
+                 ▼
+[ Stage 1: AD620 Pre-Amplifier ] ──> Differential Gain G1 ≈ 6x (Rg = 10 kΩ, CMRR > 100 dB)
+                 │
+                 ▼
+[ Stage 2: Active Bandpass Filtering ] ──> Sallen-Key HPF (0.8 Hz) + Sallen-Key LPF (30 Hz)
+                 │
+                 ▼
+[ Stage 3: Twin-T 50 Hz Notch & Intermediate Gain ] ──> Rejects 50 Hz mains, Gain G2 = 10x
+                 │
+                 ▼
+[ Stage 4: Variable Post-Amp & Level Shifter ] ──> Gain G3 = 10x to 100x + 2.5V DC offset
+                 │
+                 ▼
+[ ATmega328P 10-Bit ADC Input (0 to 5V span) ]
 ```
+
+### Circuit Schematic & Calculations
+- **Total Dynamic System Gain ($A_{\text{total}}$):**
+  $$A_{\text{total,min}} = G_1 \times G_2 \times G_{3,\text{min}} = 6 \times 10 \times 10 = 600\times$$
+  $$A_{\text{total,max}} = G_1 \times G_2 \times G_{3,\text{max}} = 6 \times 10 \times 100 = 6000\times$$
+  This elevates raw microvolt biopotentials (100 uV to 600 uV) into a measurable 0.6V to 3.6V signal centered around a +2.5V DC baseline.
+- **High-Pass Cutoff:** $R = 200\text{ k}\Omega, C = 0.9\,\mu\text{F} \implies f_c \approx 0.88\text{ Hz}$ (removes baseline wander and skin half-cell DC potential).
+- **Low-Pass Cutoff:** $R = 27\text{ k}\Omega, C = 0.2\,\mu\text{F} \implies f_c \approx 29.5\text{ Hz}$ (attenuates facial EMG interference).
+- **Notch Filter:** Twin-T topology tuned to $50.0\text{ Hz}$ ($R \approx 15.9\text{ k}\Omega, C = 0.2\,\mu\text{F}$).
+- **Power Management:** Symmetric +-9V rails generated using two series 18650 Li-ion cells regulated with a Battery Management System (BMS).
+
+![Circuit Schematic](results/eog_circuit_schematic.png)
+*Figure 1: Complete circuit schematic of the multi-stage EOG analog front-end.*
 
 ---
 
-## Experimental Evaluation & Metrics
+## Digital Signal Processing & Thresholding
 
-The platform was evaluated in our department laboratory across multiple test sessions:
+Data digitized at 250 Hz is streamed via UART (or HC-05 Bluetooth) to the processing host running MATLAB DSP System Toolbox and Python:
+- Digital moving-average filtering smooths high-frequency spikes.
+- A dual-threshold state machine detects voluntary saccades and blinks while ignoring involuntary micro-movements.
+- Blink duration ($T_{\text{width}}$) discrimination separates single involuntary blinks from deliberate command blinks.
 
-| Parameter | Measured Value | Practical Interpretation |
-| :--- | :---: | :--- |
-| Voluntary Blink SNR | **32.13 dB** | Large, sharp peaks easily separated from baseline. |
-| Upward Gaze SNR | **31.50 dB** | Clear positive deflection for row navigation. |
-| Downward Gaze SNR | **27.75 dB** | Negative deflection for column advance. |
-| Virtual Keyboard Speed | **16 characters/min** | Practical typing speed for functional communication. |
-| Directional Control Accuracy | **92.0%** | Successful navigation runs in controlled indoor hallways. |
-| Ultrasonic Sensor Latency | **< 40 ms** | Immediate motor shutoff when approaching an obstacle. |
+![MATLAB Thresholds](results/processed_eog_matlab_thresholds.png)
+*Figure 2: Real-time processed EOG signal showing peak detection thresholds for upward gaze, downward gaze, and voluntary blinks.*
 
-### Evaluation Results:
-![Virtual Keyboard Performance](results/virtual_keyboard_performance.png)
-*Figure 1: (A) Boxplot of typing speed (characters per minute) across subject evaluation trials; (B) Distribution of directional steering accuracy during wheelchair driving trials.*
+---
+
+## User Interfaces & Dual Operating Modes
+
+### 1. Arabic Virtual Optical Speller
+Users select letters in an Arabic on-screen matrix. Gaze shifts rotate through sectors, while voluntary blinks confirm selection.
+
+![Virtual Keyboard](results/virtual_keyboard_main_interface.png)
+*Figure 3: Main user interface of the virtual optical speller.*
+
+### 2. Wheelchair Driving Mode with Safety Override
+Provides directional control via eye movements. If an obstacle is detected within 40 cm (front) or 30 cm (rear) by the HC-SR04 ultrasonic sensors, the Arduino firmware immediately halts the L298N motor drivers.
+
+![Wheelchair Mode](results/wheelchair_mode_user_interface.png)
+*Figure 4: Wheelchair navigation command interface.*
+
+---
+
+## Experimental Testing with Healthy Volunteers (N = 5)
+
+Quantitative evaluation was conducted with $N = 5$ healthy participants across both modes:
+
+### 1. Wheelchair Navigation Mode (100 Total Trials)
+| Subject ID | Total Trials | Successful | Failed | Accuracy (%) | Mean Latency (ms) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Subject 1 | 20 | 19 | 1 | 95.0% | $142 \pm 10$ |
+| Subject 2 | 20 | 18 | 2 | 90.0% | $150 \pm 12$ |
+| Subject 3* | 20 | 20 | 0 | 100.0% | $135 \pm 8$ |
+| Subject 4 | 20 | 18 | 2 | 90.0% | $148 \pm 11$ |
+| Subject 5 | 20 | 19 | 1 | 95.0% | $140 \pm 9$ |
+| **Overall Mean** | **100** | **94** | **6** | **94.0%** | **$143.0 \pm 10.0$** |
+
+### 2. Virtual Optical Speller Mode (Target Phrase: "السلام عليكم ورحمة الله وبركاته", 28 characters)
+| Subject ID | Sector Accuracy (%) | Completion Time (s) | Typing Speed (CPM) | Speller Accuracy (%) |
+| :--- | :---: | :---: | :---: | :---: |
+| Subject 1 | 90.0% | 112 | 15.0 | 85.0% |
+| Subject 2 | 85.0% | 120 | 14.0 | 80.0% |
+| Subject 3* | 98.0% | 93 | 18.0 | 95.0% |
+| Subject 4 | 92.0% | 105 | 16.0 | 90.0% |
+| Subject 5 | 96.0% | 99 | 17.0 | 95.0% |
+| **Overall Mean** | **92.2%** | **105.8 s** | **16.0 CPM** | **89.0%** |
+
+*Note: Subject 3 completed an extended acclimatization session prior to testing.*
+
+---
+
+## Experimental Setup
+
+![Experimental Setup](results/experimental_test_setup.jpg)
+*Figure 5: Physical experimental test setup during subject evaluation.*
 
 ---
 
 ## Engineering Observations & Practical Challenges
 
-During testing and building the system, we encountered several practical challenges:
-1. **Ocular Fatigue:** Healthy test subjects reported eye strain after 15 to 20 minutes of continuous keyboard navigation. To reduce fatigue, we added a calibration mode that lets users adjust threshold sensitivities without having to exaggerate their blinks.
-2. **Involuntary Blinks vs. Command Blinks:** Spontaneous, involuntary blinks happen every few seconds. To prevent unwanted key selections, we implemented a dual-blink detection window (requiring two intentional blinks within 600 ms) to trigger a confirmation click.
-3. **Power Ground Isolation:** Running DC motors on the same power supply as the sensitive AD620 front-end created large voltage spikes. We isolated the motor battery supply from the analog acquisition circuit to keep the biopotential baseline steady.
+1. **Electrode Impedance:** Preparing the skin with 70% alcohol and using fresh Ag/AgCl electrodes was essential. Without skin preparation, high contact impedance caused DC saturation at the AD620 output.
+2. **Motor Switching Decoupling:** The L298N motor driver drew inductive current surges that perturbed the analog front-end ground. We resolved this by using separate battery banks for logic/AFE and motor power.
+3. **Fatigue Mitigation:** Test subjects experienced mild eye strain after 15 to 20 minutes of continuous typing. A brief 2-minute pause between sessions prevented blink threshold degradation.
 
 ---
 
-## Repository Structure
+## Repository Contents
 
 ```text
 eog-assistive-hci-keyboard/
-├── README.md                          # Technical report and capstone documentation
+├── README.md                          # Comprehensive thesis documentation
 ├── LICENSE                            # MIT License
 ├── requirements.txt                   # Python dependencies
 ├── environment.yml                    # Conda environment file
 ├── matlab/
 │   └── eog_realtime_dsp.m             # MATLAB DSP System Toolbox script
 ├── python/
-│   └── virtual_keyboard_engine.py     # Python state-machine classifier and trial simulator
+│   └── virtual_keyboard_engine.py     # Python state machine and evaluation script
 ├── firmware/
 │   └── wheelchair_controller.ino      # C/C++ firmware with ultrasonic obstacle stopping
 ├── data/
-│   └── hci_trial_data.csv             # Trial data recorded during user testing
+│   └── hci_trial_data.csv             # Trial data from subject testing
 └── results/
-    └── virtual_keyboard_performance.png # Visualization plots
-```
-
----
-
-## How to Run
-
-```bash
-# Clone the repository
-git clone https://github.com/Abdulaziz-kh-Hatem/eog-assistive-hci-keyboard.git
-cd eog-assistive-hci-keyboard
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the Python virtual keyboard engine simulation
-python python/virtual_keyboard_engine.py
+    ├── eog_circuit_schematic.png      # Circuit diagram from thesis
+    ├── processed_eog_matlab_thresholds.png # MATLAB thresholding output
+    ├── virtual_keyboard_main_interface.png # Optical speller GUI
+    ├── wheelchair_mode_user_interface.png  # Wheelchair control GUI
+    ├── experimental_test_setup.jpg    # Physical hardware test setup
+    └── character_selection_inside_sector.png # Sector selection UI
 ```
 
 ---

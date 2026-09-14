@@ -3,6 +3,8 @@
 ![Status](https://img.shields.io/badge/Project-Completed-success) 
 ![Evaluation](https://img.shields.io/badge/Grade-Distinction-blue)
 
+> **Notice:** The source code (MATLAB and Arduino firmware) for this project is currently withheld pending the publication of our academic research paper. The code will be made publicly available once the paper is accepted and published.
+
 Welcome to our senior capstone graduation project! We are a team of Biomedical Engineering undergraduate students from the University of Science and Technology in Aden, Yemen.
 
 We built this system because there is a severe lack of assistive technologies designed specifically for Arab patients, especially those suffering from ALS, locked-in syndrome, or severe quadriplegia. Our goal was to create a practical, affordable system that gives patients the ability to communicate in their native language and move around independently using only their eye movements.
@@ -68,14 +70,9 @@ We tested the system on 5 healthy student volunteers. Here is a summary of our f
 ```text
 eog-assistive-hci-keyboard/
 ├── README.md                          
-├── matlab/
-│   ├── main_bci_system.m              # The main MATLAB script that handles DSP and the UI
-│   ├── config.m                       # System variables and port configurations
-│   └── utils/                         # Helper functions for the interface graphics
-├── firmware/
-│   └── wheelchair_controller.ino      # Arduino code for the wheelchair (motors & sensors)
 └── results/                           # Photos, schematics, and screenshots of our project
 ```
+*(Note: Source code directories are temporarily hidden pending academic publication.)*
 
 ---
 

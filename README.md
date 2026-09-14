@@ -64,6 +64,11 @@ We tested the system on 5 healthy student volunteers. Here is a summary of our f
 - **Typing Speed:** Users were asked to type a 28-character Arabic phrase (السلام عليكم ورحمة الله وبركاته). On average, they typed 16 characters per minute (CPM), measured as mean completion time of 105.8 seconds across all participants. One of our team members who practiced extensively reached 18 CPM with 95% accuracy. [Watch a video demonstration here](https://youtu.be/_7P_xF_lJTU?si=B2MbOErdmBXGmws5) showing a user typing the 10-character phrase "اهلا وسهلا" in ~40 seconds, which translates to a real-time typing speed of exactly 15 CPM.
 - **Note on Participants:** All 5 volunteers were healthy university students. Testing with the target clinical population (patients with ALS, locked-in syndrome, or severe quadriplegia) has not yet been conducted and is planned as future work.
 
+### System Demonstration
+
+An offline demonstration video of the system in action has been included in this repository. 
+- [Download / Watch System Demonstration Video (24 MB)](results/eog_demo_video.mp4)
+
 ---
 
 ## Repository Contents

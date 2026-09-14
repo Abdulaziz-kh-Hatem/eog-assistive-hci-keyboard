@@ -68,4 +68,4 @@ We tested the system on 5 healthy student volunteers. Here is what we found:
 
 You can watch videos showing how the system works:
 - **Typing Demo (YouTube):** [Watch a user type "أهلا وسهلا" (10 letters) in 40 seconds (15 chars/min)](https://youtu.be/_7P_xF_lJTU?si=B2MbOErdmBXGmws5)
-- **Local Video:** [Download / Watch System Demo (24 MB)](results/eog_demo_video.mp4)
+- **Full System Demo (YouTube):** [Watch System Demo](https://youtu.be/ZO9QT6c9rzA?si=DyfI3WWjkoZByfXB)

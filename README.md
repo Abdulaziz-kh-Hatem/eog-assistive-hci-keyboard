@@ -1,4 +1,4 @@
-﻿# EOG-Based Assistive Platform (Arabic Virtual Keyboard & 3D Wheelchair)
+﻿# Design and Implementation of an Integrated EOG-Based Human-Computer Interface for Virtual Keyboard and Wheelchair Control
 
 ![Status](https://img.shields.io/badge/Project-Completed-success) 
 ![Evaluation](https://img.shields.io/badge/Grade-Distinction-blue)

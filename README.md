@@ -61,7 +61,7 @@ To test the physical navigation, we 3D-printed a miniature wheelchair and equipp
 
 We tested the system on 5 healthy student volunteers. Here is a summary of our findings:
 - **Wheelchair Navigation:** Across 100 test trials, the system correctly executed the user's directional intent 94% of the time. The EOG signal decoding pipeline (DSP) introduces a latency of 143 milliseconds, with an additional 70 ms for the hardware ultrasonic interrupt response — totaling ~213 ms from decoded command to motor actuation.
-- **Typing Speed:** Users were asked to type a 28-character Arabic phrase (السلام عليكم ورحمة الله وبركاته). On average, they typed 16 characters per minute (CPM), measured as mean completion time of 105.8 seconds across all participants. One of our team members who practiced extensively reached 18 CPM with 95% accuracy.
+- **Typing Speed:** Users were asked to type a 28-character Arabic phrase (السلام عليكم ورحمة الله وبركاته). On average, they typed 16 characters per minute (CPM), measured as mean completion time of 105.8 seconds across all participants. One of our team members who practiced extensively reached 18 CPM with 95% accuracy. [Watch a video demonstration here](https://youtu.be/_7P_xF_lJTU?si=B2MbOErdmBXGmws5) showing a user typing the 10-character phrase "اهلا وسهلا" in ~40 seconds, which translates to a real-time typing speed of exactly 15 CPM.
 - **Note on Participants:** All 5 volunteers were healthy university students. Testing with the target clinical population (patients with ALS, locked-in syndrome, or severe quadriplegia) has not yet been conducted and is planned as future work.
 
 ---

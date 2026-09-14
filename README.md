@@ -1,4 +1,4 @@
-﻿# Design and Implementation of an Integrated EOG-Based Human-Computer Interface for Virtual Keyboard and Wheelchair Control
+# Design and Implementation of an Integrated EOG-Based Human-Computer Interface for Virtual Keyboard and Wheelchair Control
 
 ![Status](https://img.shields.io/badge/Project-Completed-success) 
 ![Evaluation](https://img.shields.io/badge/Grade-Distinction-blue)
@@ -60,8 +60,9 @@ To test the physical navigation, we 3D-printed a miniature wheelchair and equipp
 ## Testing Results
 
 We tested the system on 5 healthy student volunteers. Here is a summary of our findings:
-- **Wheelchair Navigation:** Across 100 test trials, the system correctly executed the user's directional intent 94% of the time, with a very quick response delay of just 143 milliseconds.
-- **Typing Speed:** Users were asked to type a 28-character Arabic phrase. On average, they typed 16 characters per minute (CPM). One of our team members who practiced extensively reached 18 CPM with 95% accuracy.
+- **Wheelchair Navigation:** Across 100 test trials, the system correctly executed the user's directional intent 94% of the time. The EOG signal decoding pipeline (DSP) introduces a latency of 143 milliseconds, with an additional 70 ms for the hardware ultrasonic interrupt response — totaling ~213 ms from decoded command to motor actuation.
+- **Typing Speed:** Users were asked to type a 28-character Arabic phrase (السلام عليكم ورحمة الله وبركاته). On average, they typed 16 characters per minute (CPM), measured as mean completion time of 105.8 seconds across all participants. One of our team members who practiced extensively reached 18 CPM with 95% accuracy.
+- **Note on Participants:** All 5 volunteers were healthy university students. Testing with the target clinical population (patients with ALS, locked-in syndrome, or severe quadriplegia) has not yet been conducted and is planned as future work.
 
 ---
 
@@ -87,3 +88,25 @@ We are proud of what we accomplished with the resources we had.
 **Supervised by:** Dr. Nasr Kaid Ali AL-Audi  
 **Institution:** Department of Biomedical Engineering, University of Science and Technology, Aden, Yemen
 
+---
+
+## Related Publication
+
+The analog front-end (AFE) hardware platform used in this project was published as a peer-reviewed paper:
+
+> **Abdulaziz K.A. Hatem**, Ahmed M.A.S. AlKadhi, Mohammed A A. Qasem, Khaled A.M. Farhan, and Nasr Kaid Ali AL-Audi.  
+> "Design and Development of a Low-Cost Electronic Platform for Electrooculography Signals Acquisition."  
+> *Electrotehnica, Electronica, Automatica (EEA)*, vol. 74, no. 2, pp. 130-137, 2026. ISSN 1582-5175.  
+> DOI: [10.46904/eea.26.74.2.1108016](https://doi.org/10.46904/eea.26.74.2.1108016)
+
+See also: [eog-acquisition-platform](https://github.com/Abdulaziz-kh-Hatem/eog-acquisition-platform) — the dedicated repository for the published hardware platform.
+
+---
+
+## References
+
+1. R. Barea, L. Boquete, M. Mazo, and E. López, "System for assisted mobility using eye movements based on electrooculography," *IEEE Transactions on Neural Systems and Rehabilitation Engineering*, vol. 10, no. 4, pp. 209–218, 2002.
+2. A. Bulling, J. A. Ward, H. Gellersen, and G. Tröster, "Eye movement analysis for activity recognition using electrooculography," *IEEE Transactions on Pattern Analysis and Machine Intelligence*, vol. 33, no. 4, pp. 741–753, 2011.
+3. Y. Chen and W. S. Newman, "A human-robot interface based on electrooculography," in *Proc. IEEE International Conference on Robotics and Automation (ICRA)*, pp. 243–248, 2004.
+4. S. R. Soekadar et al., "Hybrid EEG/EOG-based brain/neural hand exoskeleton restores fully independent daily living activities after quadriplegia," *Science Robotics*, vol. 1, no. 1, eaag3296, 2016.
+5. Analog Devices, "AD620 Low Cost Low Power Instrumentation Amplifier," Datasheet Rev. H, 2011.
